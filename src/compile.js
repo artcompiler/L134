@@ -416,31 +416,33 @@ let render = (function() {
   }
   return render;
 })();
-export let compiler = (function () {
-  exports.langID = '0';
-  exports.version = "v1.0.0";
-  exports.compile = function compile(code, data, config, resume) {
-    // Compiler takes an AST in the form of a node pool and transforms it into
-    // an object to be rendered on the client by the viewer for this language.
-    try {
-      let options = {
-        data: data
-      };
-      transform(code, options, function (err, val) {
-        if (err.length) {
-          resume(err, val);
-        } else {
-          render(val, options, function (err, val) {
+export const compiler = (function () {
+  return {
+    langID: '117',
+    version: 'v0.0.1',
+    compile: function compile(code, data, config, resume) {
+      // Compiler takes an AST in the form of a node pool and transforms it into
+      // an object to be rendered on the client by the viewer for this language.
+      try {
+        let options = {
+          data: data
+        };
+        transform(code, options, function (err, val) {
+          if (err.length) {
             resume(err, val);
-          });
-        }
-      });
-    } catch (x) {
-      console.log("ERROR with code");
-      console.log(x.stack);
-      resume(["Compiler error"], {
-        score: 0
-      });
+          } else {
+            render(val, options, function (err, val) {
+              resume(err, val);
+            });
+          }
+        });
+      } catch (x) {
+        console.log("ERROR with code");
+        console.log(x.stack);
+        resume(["Compiler error"], {
+          score: 0
+        });
+      }
     }
-  }
+  };
 })();

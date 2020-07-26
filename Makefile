@@ -12,6 +12,6 @@ test:
 	npm run test
 
 clean:
-	rm -rf lib pub node_modules
+	rm -rf dist lib pub node_modules
 
 .PHONY: build test

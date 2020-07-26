@@ -1,18 +1,15 @@
 const bodyParser = require('body-parser');
 const express = require('express');
-const morgan = require('morgan');
 const path = require('path');
 const routes = require('./routes');
-const compiler = require("./lib/compile.js");
-const {createAuth} = require('./lib/auth.js');
+const {compiler} = require("./dist/compile.js");
+const {createAuth} = require('./dist/auth.js');
 
 const auth = createAuth(compiler);
 const app = exports.app = express();
 
 global.config = require("./config.json");
 const PORT = process.env.PORT || `5${compiler.langID}`;
-
-app.use(morgan('dev'));
 
 // service only accepts json requests
 app.use(bodyParser.json({ type: 'application/json', limit: '50mb' }));
