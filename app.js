@@ -2,7 +2,6 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
-
 const routes = require('./routes');
 const compiler = require("./lib/compile.js");
 const {createAuth} = require('./lib/auth.js');

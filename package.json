@@ -1,58 +1,30 @@
 {
-  "name": "L0",
+  "name": "L2",
   "version": "0.0.1",
   "description": "Compiler as a service.",
-  "author": "Art Compiler LLC",
+  "author": "Artcompiler Inc",
   "license": "MIT",
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/graffiticode/L0"
+    "url": "https://github.com/graffiticode/L2"
   },
-  "dependencies": {
-    "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.9.4",
-    "aws-serverless-express": "^3.3.6",
-    "body-parser": "^1.19.0",
-    "domready": "^1.0.8",
-    "express": "^4.17.1",
-    "hashids": "1.1.1",
-    "morgan": "^1.9.1",
-    "request": "^2.88.0",
-    "typescript": "^3.7.4"
-  },
+  "dependencies": {},
   "engines": {
-    "node": "latest"
+    "node": "14.4.0"
   },
   "devDependencies": {
-    "@pollyjs/adapter-node-http": "^2.7.0",
-    "@pollyjs/core": "^2.6.3",
-    "@pollyjs/persister-fs": "^2.6.3",
-    "browserify": "^12.0.1",
-    "chai": "^4.2.0",
-    "d3": "4.7.1",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
-    "jest": "^24.9.0",
-    "jsdom": "^15.2.1",
-    "json-diff": "^0.5.4",
-    "nodemon": "^1.19.4",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-test-renderer": "^16.12.0",
-    "sinon": "^7.5.0",
-    "supertest": "^4.0.2",
-    "uglify-js": "^2.7.3"
+    "d3": "^5.16.0",
+    "hashids": "^2.2.1",
+    "react": "^16.13.1",
+    "request": "^2.88.2",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.0",
+    "webpack-cli": "^3.3.12"
   },
   "scripts": {
     "start": "node app.js",
-    "build": "tsc tools/build.ts --outDir build/tools; node build/tools/build.js",
-    "pretest": "npm run build",
-    "test": "jest build/",
-    "watch": "npx nodemon -w src -w index.js -w package.json --exec make",
-    "lambda:zip": "zip -r function.zip . -x=.git/*",
-    "lambda:update": "aws lambda update-function-code --function-name L0 --zip-file fileb://function.zip",
-    "deploy:lambda": "npm run build && npm run lambda:zip && npm run lambda:update",
-    "deploy:gcloud": "gcloud functions deploy L0 --trigger-http --runtime=nodejs10 --entry-point=compiler"
+    "build": "node tools/build.js"
   }
 }
