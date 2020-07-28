@@ -41,14 +41,24 @@ class Viewer extends React.Component {
 
     return (
       elts.length > 0 ? <div>
-        <link rel="stylesheet" href="/L0/style.css" />
-        <div className="L0">
-        {elts}
+        <link rel="stylesheet" href="/L117/style.css" />
+        <div className="L117">
+          {elts}
+          <br/> <br />
+          <form id="uploadbanner" enctype="multipart/form-data" method="post" action="/convert">
+            <input id="fileupload" name="myfile" type="file" />
+            <br /> <br />
+            <input type="submit" value="submit" id="submit" />
+          </form>
         </div>
       </div> : <div/>
     );
   }
 };
+
+function uploadFile() {
+  console.log("uploadFile()");
+}
 
 window.gcexports.viewer = (function () {
   return {
