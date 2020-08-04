@@ -9,6 +9,7 @@ import {
 } from "./share.js";
 import * as React from "react";
 import * as d3 from "d3";
+const FitParser = require('../node_modules/fit-file-parser/dist/fit-parser.js').default;
 
 class Viewer extends React.Component {
   componentDidMount() {
@@ -45,19 +46,43 @@ class Viewer extends React.Component {
         <div className="L117">
           {elts}
           <br/> <br />
-          <form id="uploadbanner" enctype="multipart/form-data" method="post" action="/convert">
-            <input id="fileupload" name="myfile" type="file" />
-            <br /> <br />
-            <input type="submit" value="submit" id="submit" />
-          </form>
+          <input id="fileupload" name="myfile" type="file" onChange={handleChange} />
         </div>
       </div> : <div/>
     );
   }
 };
 
-function uploadFile() {
-  console.log("uploadFile()");
+function parseFile(file) {
+  var fitParser = new FitParser({
+    force: true,
+    speedUnit: 'km/h',
+    lengthUnit: 'km',
+    temperatureUnit: 'fahrenheit',
+    elapsedRecordField: true,
+    mode: 'cascade',
+  });
+  // Parse your file
+  const content = new Uint8Array(file);
+  fitParser.parse(content, function (error, data) {
+    window.gcexports.dispatcher.dispatch({
+      [window.gcexports.id]: {
+        data: data,
+        recompileCode: true,
+      }
+    });
+  });
+}
+
+function handleChange(e) {
+  const inputElement = e.target;
+  const file = inputElement.files[0];
+  const reader = new FileReader;
+  reader.readAsArrayBuffer(file);
+  reader.onload = (e) => {
+    console.log(e.target.result);
+    parseFile(e.target.result);
+  };
 }
 
 window.gcexports.viewer = (function () {

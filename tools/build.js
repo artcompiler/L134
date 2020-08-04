@@ -42,7 +42,7 @@ function bundle() {
   exec("cat ./tools/license.js | sed 's/{{sha}}/" + sha + "/' >> ./dist/compile.js");
   exec("cp ./src/lexicon.js ./pub");
   exec("cp ./src/style.css ./pub");
-  exec("cp ./dist/viewer.js ./pub");
+  exec("cp ./dist/viewer.js* ./pub");
 }
 function build(debug) {
   let t0 = Date.now();
