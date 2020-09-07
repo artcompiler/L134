@@ -1016,13 +1016,16 @@ class Viewer extends React.Component {
     var elts = render(data, props);
     return (
       elts.length > 0 ? <div>
-        <link rel="stylesheet" href="/L117/style.css" />
-        <div className="L117">
+        <link rel="stylesheet" href="/L134/style.css" />
+        <div className="L134">
             {elts}
         <br/> <br />
         <input id="fileupload" name="myfile" type="file" onChange={handleChange} />
         </div>
-        </div> : <div/>
+        </div>
+        : <div>
+        <input id="fileupload" name="myfile" type="file" onChange={handleChange} />
+        </div>
     );
   }
 }
@@ -1050,15 +1053,17 @@ function parseFile(file) {
 }
 
 function filterData(data) {
-  const activity = data.activity;
-  const session = activity.sessions[0];
-  const lap = session.laps[0];
-  const records = lap.records;
-  const dataFiltered = [["hr"]];
-  records.forEach(r => {
-    dataFiltered.push([r.heart_rate]);
-  });
-  return dataFiltered;
+  // FIXME get filter from obj.
+  return data;
+  // const activity = data.activity;
+  // const session = activity.sessions[0];
+  // const lap = session.laps[0];
+  // const records = lap.records;
+  // const dataFiltered = [["hr"]];
+  // records.forEach(r => {
+  //   dataFiltered.push([r.heart_rate]);
+  // });
+  // return dataFiltered;
 }
 
 function handleChange(e) {

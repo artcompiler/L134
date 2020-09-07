@@ -1,5 +1,6 @@
 /* @flow */
 window.gcexports.globalLexicon = {
+  "query" : { "tk": 1, "name": "QUERY", "cls": "function", "length": 2, "arity": 2 },
   "title" : { "tk": 1, "name": "TITLE", "cls": "function", "length": 2, "arity": 2 },
   "rgb" : { "tk": 1, "name": "RGB", "cls": "function", "length": 1 },
   "palette" : { "tk": 1, "name": "PALETTE", "cls": "function", "length": 2 },
