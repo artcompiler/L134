@@ -404,12 +404,9 @@ const transform = (function() {
   // https://github.com/graphql/graphql-js
   function query(node, options, resume) {
     visit(node.elts[0], options, function (err1, query) {
-      console.log("query() query=" + query);
       visit(node.elts[1], options, function (err2, root) {
-        console.log("query() root=" + JSON.stringify(root, null, 2));
         const schema = schemaFromObject(root);
         graphql(schema, query, root).then((val) => {
-          console.log("query() val=" + JSON.stringify(val, null, 2));
           resume([].concat(err1).concat(err2), val);
         });
       });
@@ -449,7 +446,6 @@ export const compiler = (function () {
             resume(err, val);
           } else {
             render(val, options, function (err, val) {
-              console.log("compile() val=" + JSON.stringify(val, null, 2));
               resume(err, val);
             });
           }
