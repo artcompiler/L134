@@ -7,7 +7,17 @@ import {
   decodeID,
   encodeID,
   validate,
-} from "./share.js"
+} from "./share.js";
+import {
+  graphql,
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLList,
+} from 'graphql';
 
 reserveCodeRange(1000, 1999, "compile");
 messages[1001] = "Node ID %1 not found in pool.";
@@ -323,16 +333,85 @@ const transform = (function() {
   function style(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        val2.style = val1
+        val2.style = val1;
         resume([].concat(err1).concat(err2), val2);
       });
     });
   }
-  // FIXME https://github.com/graphql/graphql-js
+
+  function typeFromValue(name, val) {
+    let type;
+    if (typeof val === 'boolean') {
+      type = GraphQLBoolean;
+    } else if (typeof val === 'string') {
+      type = GraphQLString;
+    } else if (typeof val === 'number') {
+      if (Number.isInteger(val)) {
+        type = GraphQLInt;
+      } else {
+        type = GraphQLFloat;
+      }
+    } else if (val instanceof Array && val.length > 0) {
+      type = typeFromValue(name, val[0]);
+      assert(type);
+      type = new GraphQLList(type);
+    } else if (typeof val === 'object' && val !== null && Object.keys(val).length > 0) {
+      type = objectTypeFromObject(name, val);
+    }
+    return type;
+  }
+  function typeFromArrayOfValues(name, vals) {
+    // Create a subtype or union type from an array of values.
+    const obj = {};
+    if (false && vals.length > 1) {
+      vals.forEach(val => {
+        // For now, assume elements are objects.
+        assert(typeof val === 'object' && val !== null && !(val instanceof Array));
+        Object.keys(val).forEach(key => {
+          if (obj[key] === undefined) {
+            obj[key] = val[key];
+          }
+        });
+      });
+    } else {
+      obj = vals[0];
+    }
+    return typeFromValue(name, obj);
+  }
+  function objectTypeFromObject(name, obj) {
+    assert(name !== '0' && name !== '"0"');
+    const fields = {};
+    Object.keys(obj).forEach(key => {
+      const type = typeFromValue(name + '_' + key, obj[key]);
+      if (type && isNaN(+key)) {
+        fields[key] = {
+          type: type,
+        };
+      }
+    });
+    return new GraphQLObjectType({
+      name: name,
+      fields: fields,
+    });
+  }
+  function schemaFromObject(obj) {
+    const type = objectTypeFromObject('root', obj);
+    return new GraphQLSchema({
+      query: type,
+    });
+  }
+  
+  // https://github.com/graphql/graphql-js
   function query(node, options, resume) {
-    visit(node.elts[0], options, function (err1, val1) {
-      visit(node.elts[1], options, function (err2, val2) {
-        resume([].concat(err1).concat(err2), val2);
+    visit(node.elts[0], options, function (err1, query) {
+      console.log("query() query=" + query);
+      visit(node.elts[1], options, function (err2, root) {
+        console.log("query() root=" + JSON.stringify(root, null, 2));
+        const schema = schemaFromObject(root);
+        graphql(schema, query, root).then((val) => {
+          console.log("query() val=" + JSON.stringify(val, null, 2));
+          resume([].concat(err1).concat(err2), val);
+        });
       });
     });
   }
@@ -370,6 +449,7 @@ export const compiler = (function () {
             resume(err, val);
           } else {
             render(val, options, function (err, val) {
+              console.log("compile() val=" + JSON.stringify(val, null, 2));
               resume(err, val);
             });
           }
