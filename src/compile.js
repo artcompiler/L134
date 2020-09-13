@@ -150,7 +150,10 @@ const transform = (function() {
           err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
         }
         let data = options.data && Object.keys(options.data).length != 0 ? options.data : val1;
-        resume([].concat(err1), data);
+        resume([].concat(err1), {
+          errors: err1,
+          data: data,
+        });
       });
     }
   }
@@ -404,7 +407,8 @@ const transform = (function() {
   // https://github.com/graphql/graphql-js
   function query(node, options, resume) {
     visit(node.elts[0], options, function (err1, query) {
-      visit(node.elts[1], options, function (err2, root) {
+      visit(node.elts[1], options, function (err2, data) {
+        const root = data.data;
         const schema = schemaFromObject(root);
         graphql(schema, query, root).then((val) => {
           resume([].concat(err1).concat(err2), val);
