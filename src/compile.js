@@ -57,6 +57,7 @@ const transform = (function() {
     return pool.version ? +pool.version : 0;
   }
   function transform(code, data, resume) {
+    console.log("transform() data=" + JSON.stringify(data));
     nodePool = code;
     version = getVersion(code);
     return visit(code.root, data, resume);
@@ -68,6 +69,7 @@ const transform = (function() {
     };
   }
   function visit(nid, options, resume) {
+    console.log("visit() options=" + JSON.stringify(options));
     assert(typeof resume === "function", message(1003));
     // Get the node from the pool of nodes.
     let node;
@@ -150,10 +152,9 @@ const transform = (function() {
           err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
         }
         let data = options.data && Object.keys(options.data).length != 0 ? options.data : val1;
-        resume([].concat(err1), {
-          errors: err1,
-          data: data,
-        });
+        console.log("defaults() options=" + JSON.stringify(options));
+        console.log("defaults() data=" + JSON.stringify(data));
+        resume([].concat(err1), data);
       });
     }
   }
@@ -280,6 +281,7 @@ const transform = (function() {
     });
   }
   function val(node, options, resume) {
+    console.log("val() options=" + JSON.stringify(options));
     visit(node.elts[0], options, function (err1, val1) {
       let key = val1;
       if (false) {
@@ -287,6 +289,7 @@ const transform = (function() {
       }
       visit(node.elts[1], options, function (err2, val2) {
         let obj = val2;
+        console.log("val() key=" + JSON.stringify(key) + " obj=" + JSON.stringify(obj, null, 2));
         if (false) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
@@ -407,11 +410,15 @@ const transform = (function() {
   // https://github.com/graphql/graphql-js
   function query(node, options, resume) {
     visit(node.elts[0], options, function (err1, query) {
-      visit(node.elts[1], options, function (err2, data) {
-        const root = data.data;
+      visit(node.elts[1], options, function (err2, root) {
+        console.log("query() data=" + JSON.stringify(root));
         const schema = schemaFromObject(root);
         graphql(schema, query, root).then((val) => {
-          resume([].concat(err1).concat(err2), val);
+          if (val.errors) {
+            resume(val.errors);
+          } else {
+            resume([].concat(err1).concat(err2), val.data);
+          }
         });
       });
     });
@@ -447,10 +454,12 @@ export const compiler = (function () {
         };
         transform(code, options, function (err, val) {
           if (err.length) {
-            resume(err, val);
+            console.log("compile() err=" + JSON.stringify(err));
+            resume([], {data: err});
           } else {
             render(val, options, function (err, val) {
-              resume(err, val);
+              console.log("compile() val=" + JSON.stringify(val));
+              resume([], {data: val});
             });
           }
         });
